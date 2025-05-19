@@ -180,11 +180,20 @@ class Employee:
             SELECT *
             FROM employees
             WHERE name is ?
+            LIMIT 1
         """
 
         row = CURSOR.execute(sql, (name,)).fetchone()
         return cls.instance_from_db(row) if row else None
 
     def reviews(self):
-        """Return list of reviews associated with current employee"""
-        pass
+   
+        from lib.review import Review  # Import inside method to avoid circular imports
+
+        sql = "SELECT * FROM reviews WHERE employee_id = ?"
+        CURSOR.execute(sql, (self.id,))
+        rows = CURSOR.fetchall()
+
+        return [Review.instance_from_db(row) for row in rows]
+    
+   
